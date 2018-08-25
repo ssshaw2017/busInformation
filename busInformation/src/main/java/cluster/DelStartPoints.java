@@ -9,7 +9,8 @@ import beans.NetpackGps;
 /**
  * @author lzl
  * @version 创建时间：2018年8月20日 上午12:02:36
- * @comment 删除起点坐标，里面包括删除起点方法delStartPoints，获得起点几何中心点方法getStartPoint，计算两点之间距离euclideanDistance，获取当前点邻居obtainNeighbors
+ * @comment 删除起点坐标，里面包括删除起点方法delStartPoints，获得起点几何中心点方法getStartPoint，
+ *          计算两点之间距离euclideanDistance，获取当前点邻居obtainNeighbors
  *          聚类方法mergeCluster和cluster
  */
 public class DelStartPoints {
