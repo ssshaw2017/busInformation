@@ -16,11 +16,12 @@ import beans.NetpackGps;
 public class DelStartPoints {
     public static int clusterIdMax = 0;// 最大的clusterId值
     public static int clusterIdMost = 0;// 最多的clusterId值
-    public static double delRadius = 60;// 删除起点半径
+    public static double delRadius = 600;// 删除起点半径
     public static double Epislon = 30;// 聚类半径
-    public static int MinPts = 3;// 密度、最小点个数
+    public static int MinPts = 30;// 起点聚类的密度、最小点个数
+    public static int EndMinPts = 6;// 起点聚类的密度、最小点个数
     List<NetpackGps> delStartGps = new ArrayList<NetpackGps>();// 已删除起点的数据集
-    List<NetpackGps> startGps = new ArrayList<NetpackGps>();// 起点几何中心点
+    NetpackGps startGps = new NetpackGps();// 起点几何中心点
 
     // 定义方法删除起点delStartPoint
     public List<NetpackGps> delStartPoints(List<NetpackGps> netpackGps) {
@@ -36,7 +37,7 @@ public class DelStartPoints {
         return delStartGps;
     }
 
-    // 计算两个点的经纬度距离转化成米
+    // 计算两个点的经纬度距离转化成米，保留一位小数
     public static double EARTH_RADIUS = 6371.393;
 
     public static double rad(double d) {
@@ -94,24 +95,25 @@ public class DelStartPoints {
     }
 
     // 调用聚类方法进行聚类
-    public List<NetpackGps> cluster(List<NetpackGps> points) {
+    public List<NetpackGps> cluster(List<NetpackGps> netpackGps) {
         // clusterId初始为0表示未分类,分类后设置为一个正数,如果设置为-1表示噪声
         int clusterId = 0;
         // 遍历所有的点
-        for (NetpackGps point : points) {
+        for (NetpackGps point : netpackGps) {
             // 遍历过就跳过
             if (point.isVisited()) {
                 continue;
             }
             point.setVisited(true);
             // 找到其邻域所有点
-            List<NetpackGps> neighbors = obtainNeighbors(point, points);
+            List<NetpackGps> neighbors = obtainNeighbors(point, netpackGps);
             // 邻域中的点大于MinPts，则为核心点
+            System.out.println("neighbors的大小为：" + neighbors.size());
             if (neighbors.size() >= MinPts) {
                 // 满足核心对象条件的点创建一个新簇
                 clusterId = point.getClusterId() <= 0 ? (++clusterId) : point.getClusterId();
                 // 处理该簇内所有未被标记为已访问的点，对簇进行扩展
-                mergeCluster(point, neighbors, clusterId, points);
+                mergeCluster(point, neighbors, clusterId, netpackGps);
                 if (clusterId > clusterIdMax) {
                     clusterIdMax = clusterId;
                 }
@@ -122,7 +124,43 @@ public class DelStartPoints {
                 }
             }
         }
-        return points;
+        return netpackGps;
+    }
+
+    // 终点聚类的方法clusterEnd
+    public List<NetpackGps> clusterEnd(List<NetpackGps> netpackGps) {
+        // clusterId初始为0表示未分类,分类后设置为一个正数,如果设置为-1表示噪声
+        int clusterId = 0;
+        for (NetpackGps point : netpackGps) {
+            point.setVisited(false);
+        }
+        // 遍历所有的点
+        for (NetpackGps point : netpackGps) {
+            // 遍历过就跳过
+            if (point.isVisited()) {
+                continue;
+            }
+            point.setVisited(true);
+            // 找到其邻域所有点
+            List<NetpackGps> neighbors = obtainNeighbors(point, netpackGps);
+            // 邻域中的点大于MinPts，则为核心点
+            System.out.println("neighbors的大小为：" + neighbors.size());
+            if (neighbors.size() >= EndMinPts) {
+                // 满足核心对象条件的点创建一个新簇
+                clusterId = point.getClusterId() <= 0 ? (++clusterId) : point.getClusterId();
+                // 处理该簇内所有未被标记为已访问的点，对簇进行扩展
+                mergeCluster(point, neighbors, clusterId, netpackGps);
+                if (clusterId > clusterIdMax) {
+                    clusterIdMax = clusterId;
+                }
+            } else {
+                // 未满足核心对象条件的点暂时当作噪声处理
+                if (point.getClusterId() <= 0) {
+                    point.setClusterId(-1);
+                }
+            }
+        }
+        return netpackGps;
     }
 
     // 打印几何中心点周围点的方法deleteSurroundings
@@ -154,9 +192,9 @@ public class DelStartPoints {
                 t = k;
                 big[0] = sumx;
                 big[1] = sumy;
-                clusterIdMax = i;
+                // clusterIdMax = i;
                 netpackGpsMost.setGeo_l(sumx);
-                netpackGpsMost.setGeo_l(sumy);
+                netpackGpsMost.setGeo_b(sumy);
             }
             // 输出（i ， sumx ，sumy）
             // System.out.println(i + "," + df.format(sumx) + "," +
@@ -175,7 +213,7 @@ public class DelStartPoints {
     }
 
     // 获得几何中心点的方法getStartPoint
-    public List<NetpackGps> getStartpoint(List<NetpackGps> points) {
+    public NetpackGps getStartpoint(List<NetpackGps> points) {
         int t = 0;
         double[] big = new double[2];
         // 分别对clusterid从1到最大值求几何中心
@@ -199,9 +237,9 @@ public class DelStartPoints {
                 t = k;
                 big[0] = sumx;
                 big[1] = sumy;
-                clusterIdMax = i;
-                startGps.get(0).setGeo_l(sumx);
-                startGps.get(0).setGeo_l(sumy);
+                // clusterIdMax = i;
+                startGps.setGeo_l(sumx);
+                startGps.setGeo_b(sumy);
             }
         }
         return startGps;

@@ -19,7 +19,7 @@ public class DelEndPoints {
     DelStartPoints delStartPoints = new DelStartPoints();// 引用删除起点类中的聚类方法cluster
     List<NetpackGps> delEndGps = new ArrayList<NetpackGps>();// 已删除终点集
     List<NetpackGps> endPoints = new LinkedList<>();// 终点集
-    List<NetpackGps> endPoint = new LinkedList<>();// 几何中心点
+    NetpackGps endPoint = new NetpackGps();// 几何中心点
     // 删除终点方法deleteEnds
 
     public List<NetpackGps> deleteEnds(List<NetpackGps> points) throws ParseException {
@@ -39,7 +39,7 @@ public class DelEndPoints {
     }
 
     // 获得终点几何中心点方法getEndPoint
-    public List<NetpackGps> getEnds(List<NetpackGps> points) throws ParseException {
+    public NetpackGps getEnds(List<NetpackGps> points) throws ParseException {
         int k = 1;
         System.out.println("获取终点开始");
         for (NetpackGps point : points) {
@@ -52,8 +52,8 @@ public class DelEndPoints {
             k = k + 1;
         }
         System.out.println("终点聚类开始");
-        delStartPoints.cluster(endPoints);// 这里的聚类方法调用了删除起点坐标里面的聚类方法cluster
-        System.out.println("输出几何中心点开始");
+        delStartPoints.clusterEnd(endPoints);// 这里的聚类方法调用了删除起点坐标里面的聚类方法cluster
+        System.out.println("输出几何中心点开始 ");
         endPoint = delStartPoints.getStartpoint(endPoints);// 这里的获取几何中心点方法调用了删除起点坐标里面的获取几何中心点方法getStartPoint
         System.out.println("获取终点结束");
         return endPoint;
@@ -70,7 +70,7 @@ public class DelEndPoints {
         Long startLong = start.getTime();
         Long endLong = end.getTime();
         // 计算时间差,单位秒
-        Long s = (endLong - startLong) / 1000;
+        Long s = Math.abs((endLong - startLong) / 1000);
         return s;
     }
 

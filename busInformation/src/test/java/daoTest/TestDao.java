@@ -26,15 +26,14 @@ public class TestDao {
     // 以下测试方法是从数据库查询后的结果（不只一条记录）给相应的Javabean的属性赋值，并在控制台显示出多条打印结果
     @Test
     public void testquerylist() {
-        String sql = "select ng.datetime as datetime from netpack_gps2 ng where ng.datetime like '2018-01-11%' and ng.bus_no=43";
+        String sql = "select ng.datetime as datetime,ng.geo_l as geo_l,ng.geo_b as geo_b from netpack_gps2 ng where ng.datetime like '2018-01-11%' and ng.line_no=1 and ng.updown=1 and ng.bus_no=2915";
         log.info("----------------查询列表开始---------------------------------------");
         List<NetpackGps> netpackGps = new ArrayList<NetpackGps>();
         // 查询
         netpackGps = (List<NetpackGps>) dao.querylist(NetpackGps.class, sql);
         // 遍历输出查询结果
         for (NetpackGps netpackgps : netpackGps) {
-            System.out.println("入库时间为：" + netpackgps.getDatetime());
-            System.out.println(netpackGps.size());
+            System.out.println(netpackgps.getGeo_b() + "," + netpackgps.getGeo_l());
         }
 
     }

@@ -13,13 +13,14 @@ import cluster.DelStartPoints;
 public class DouglasPeucker {
     DelStartPoints delStartPoints = new DelStartPoints();
 
-    public List<NetpackGps> TrajCompressC(List<NetpackGps> startGps, List<NetpackGps> netpackGps,
+    public List<NetpackGps> TrajCompressC(NetpackGps startGps, NetpackGps endPoint, List<NetpackGps> netpackGps,
             List<NetpackGps> dpedPoints, int start, int end, double DMax) {
+        // System.out.println("Douglas-Peucker算法实现开始。。。。。。。。。");
         if (start < end) {// 递归进行的条件
             double maxDist = 0;// 最大距离
             int cur_pt = 0;// 当前下标
             for (int i = start + 1; i < end; i++) {
-                double curDist = distToSegment(startGps.get(0), startGps.get(1), netpackGps.get(i));// 当前点到对应线段的距离
+                double curDist = distToSegment(startGps, endPoint, netpackGps.get(i));// 当前点到对应线段的距离
                 if (curDist > maxDist) {
                     maxDist = curDist;
                     cur_pt = i;
@@ -29,8 +30,8 @@ public class DouglasPeucker {
             if (maxDist >= DMax) {
                 dpedPoints.add(netpackGps.get(cur_pt));// 将当前点加入到过滤数组中
                 // 将原来的线段以当前点为中心拆成两段，分别进行递归处理
-                TrajCompressC(startGps, netpackGps, dpedPoints, start, cur_pt, DMax);
-                TrajCompressC(startGps, netpackGps, dpedPoints, cur_pt, end, DMax);
+                TrajCompressC(startGps, endPoint, netpackGps, dpedPoints, start, cur_pt, DMax);
+                TrajCompressC(startGps, endPoint, netpackGps, dpedPoints, cur_pt, end, DMax);
             }
         }
         return dpedPoints;
