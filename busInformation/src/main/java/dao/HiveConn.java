@@ -18,12 +18,16 @@ public class HiveConn {
     public static Connection getConnection() throws ClassNotFoundException, SQLException {
         // 寻找驱动类drivername
         Class.forName(driverName);
-        Connection conn = DriverManager.getConnection(url, user, password);
-        // 检验是否连上hive数据库
-        ResultSet res = conn.createStatement().executeQuery("show tables");
-        while (res.next()) {
-            System.out.println(res.getString(1));
+        Connection conn = null;
+        try {
+            conn = DriverManager.getConnection(url, user, password);
+            System.out.print("数据库连接成功！");
+        } catch (SQLException e) {
+            // TODO Auto-generated catch block
+            System.out.println("数据库连接失败！");
+            e.printStackTrace();
         }
+
         return conn;
     }
 

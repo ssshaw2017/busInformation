@@ -108,7 +108,7 @@ public class DelStartPoints {
             // 找到其邻域所有点
             List<NetpackGps> neighbors = obtainNeighbors(point, netpackGps);
             // 邻域中的点大于MinPts，则为核心点
-            System.out.println("neighbors的大小为：" + neighbors.size());
+            // System.out.println("neighbors的大小为：" + neighbors.size());
             if (neighbors.size() >= MinPts) {
                 // 满足核心对象条件的点创建一个新簇
                 clusterId = point.getClusterId() <= 0 ? (++clusterId) : point.getClusterId();
@@ -144,7 +144,7 @@ public class DelStartPoints {
             // 找到其邻域所有点
             List<NetpackGps> neighbors = obtainNeighbors(point, netpackGps);
             // 邻域中的点大于MinPts，则为核心点
-            System.out.println("neighbors的大小为：" + neighbors.size());
+            // System.out.println("neighbors的大小为：" + neighbors.size());
             if (neighbors.size() >= EndMinPts) {
                 // 满足核心对象条件的点创建一个新簇
                 clusterId = point.getClusterId() <= 0 ? (++clusterId) : point.getClusterId();

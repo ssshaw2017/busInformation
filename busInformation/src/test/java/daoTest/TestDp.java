@@ -11,6 +11,7 @@ import org.junit.Test;
 import beans.NetpackGps;
 import cluster.DelEndPoints;
 import cluster.DelStartPoints;
+import convertors.DpConvert;
 import dao.DAO;
 import dp.DouglasPeucker;
 
@@ -21,7 +22,7 @@ import dp.DouglasPeucker;
  */
 public class TestDp {
     private static Logger log = Logger.getLogger(TestDp.class);
-    public static double DMax = 200.0;
+    public static double DMax = 500.0;
     public static int start = 0;
     private DAO dao = new DAO();
 
@@ -36,11 +37,13 @@ public class TestDp {
         List<NetpackGps> delStartGps = new ArrayList<NetpackGps>();// 已删除起点集
         NetpackGps startGps = new NetpackGps();// 起点几何中心点
         List<NetpackGps> delEndGps = new ArrayList<NetpackGps>();// 已删除终点集
+        List<NetpackGps> BaiduGps = new ArrayList<NetpackGps>();// 百度坐标点
         NetpackGps endPoint = new NetpackGps();// 终点几何中心点
         List<NetpackGps> dpedPoints = new ArrayList<NetpackGps>();
         DelStartPoints delStart = new DelStartPoints();
         DelEndPoints delEndPoints = new DelEndPoints();
         DouglasPeucker douglasPeucker = new DouglasPeucker();
+        DpConvert dpConvert = new DpConvert();
         // 查询
         netpackGps = (List<NetpackGps>) dao.querylist(NetpackGps.class, sql);
         System.out.println("查询到的netpackGps数据总数为:" + netpackGps.size());
@@ -57,10 +60,12 @@ public class TestDp {
         // douglas-pucker算法
         int end = delEndGps.size();
         dpedPoints = douglasPeucker.TrajCompressC(startGps, endPoint, delEndGps, dpedPoints, start, end, DMax);
-        System.out.println("抽稀后的总数为" + dpedPoints.size() + "输出如下：");
+        System.out.println("抽稀后的总数为new BMap.Point(114.416877,38.03992 )," + dpedPoints.size() + "输出如下：");
         // 输出抽稀后的点
         for (NetpackGps point : dpedPoints) {
-            System.out.println(point.getGeo_b() + "," + point.getGeo_l());
+            dpConvert.wgs84Tobd09(point);
+            BaiduGps.add(point);
+            System.out.println("new BMap.Point(" + point.getGeo_l() + "," + point.getGeo_b() + "),");
         }
     }
 }
